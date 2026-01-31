@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: 'Standard Dashboards'
+    type: file
+    options:
+      # This path must match the volume mount path inside the container
+      path: /var/lib/grafana/dashboards
