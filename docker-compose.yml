@@ -77,7 +77,7 @@ services:
     environment:
       DEBUG: "0"
       DATABASE_URL: postgresql://postgres:yourpassword@plc_db/testdb
-      ALLOWED_ORIGINS: "http://plc.morrisunix.info:3000,http://plc:3000"
+      ALLOWED_ORIGINS: "http://plc.morrisunix.info:3000,http://plc:3000,http://prod.morrisunix.info:3000,http://prod:3000"
     depends_on:
       influxdb:
         condition: service_healthy # This makes Grafana wait until InfluxDB is 'healthy'
@@ -98,7 +98,7 @@ services:
     build:
       context: ./frontend
       args:
-        - REACT_APP_BACKEND_IP=plc.morrisunix.info
+        - REACT_APP_BACKEND_IP=prod.morrisunix.info
         - REACT_APP_BACKEND_PORT=8000
     container_name: plc_frontend
     ports:
