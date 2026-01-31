@@ -1,0 +1,193 @@
+services:
+  db:
+    image: postgres:15
+    container_name: plc_db
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: testdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - plc-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+  
+  influxdb:
+    build: ./influxdb
+    container_name: plc_influxdb
+    ports:
+      - "8086:8086"
+    restart: unless-stopped
+    healthcheck: # Added healthcheck for InfluxDB
+      # Use curl to check if the InfluxDB /ping endpoint is reachable and returns a success code
+      # The -f flag makes curl return a non-zero exit code on HTTP errors (e.g., 4xx or 5xx)
+      test: ["CMD-SHELL", "curl -f http://localhost:8086/ping || exit 1"]
+      interval: 5s       # How often to run the check
+      timeout: 10s       # How long to wait for a response
+      retries: 10        # How many consecutive failures before marking as 'unhealthy'
+      start_period: 30s  # Initial period to wait for the service to start before health checks count
+    environment:
+      INFLUXDB_HTTP_AUTH_ENABLED: true
+      INFLUXDB_ADMIN_USER: admin
+      INFLUXDB_ADMIN_PASSWORD: supersecretpassword
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    networks:
+      - plc-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    secrets:
+      - plc_layout
+    container_name: plc_backend
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:8000 | grep -Fq '{\"message\":\"PLC Backend is running\"}' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    environment:
+      DEBUG: "0"
+      DATABASE_URL: postgresql://postgres:yourpassword@plc_db/testdb
+      ALLOWED_ORIGINS: "http://plc.morrisunix.info:3000,http://plc:3000"
+    depends_on:
+      influxdb:
+        condition: service_healthy # This makes Grafana wait until InfluxDB is 'healthy'
+      db:
+        condition: service_healthy # This makes Grafana wait until db is started 
+    networks:
+      - plc-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - REACT_APP_BACKEND_IP=plc.morrisunix.info
+        - REACT_APP_BACKEND_PORT=8000
+    container_name: plc_frontend
+    ports:
+      - "3000:80"
+    stdin_open: true # Required for React development mode
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - plc-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+  
+  grafana:
+    build:
+      context: .
+      dockerfile: ./grafana/Dockerfile
+    container_name: plc_grafana
+    ports:
+      - "3001:3000"
+    restart: unless-stopped
+    depends_on:
+      - influxdb
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_SECURITY_ADMIN_PASSWORD=Falcon32
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://plc.morrisunix.info:3001
+      - GF_DEFAULT_INSTANCE_NAME=PLC
+      - GF_USERS_DEFAULT_THEME=dark
+      - INFLUXDB_HOST=plc_influxdb
+      - INFLUXDB_PORT=8086
+      - INFLUXDB_USER=admin
+      - INFLUXDB_PASSWORD=supersecretpassword
+    networks:
+      - plc-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+  
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    ports:
+      - "9443:9443"
+      - "8001:8001"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    command: --tunnel-port 8001
+    networks:
+      - plc-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+volumes:
+  postgres_data:
+    driver: local
+  influxdb_data:
+    driver: local
+  grafana_data:
+    driver: local
+  portainer_data:
+    driver: local
+
+networks:
+  plc-net:
+    driver: bridge
+
+secrets:
+  plc_layout:
+    file: ./plc_layout.yml
