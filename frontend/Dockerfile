@@ -1,10 +1,12 @@
-FROM node:20 AS build
+# FROM node:20 AS build
 
+# WORKDIR /app
+# COPY package*.json ./
+# RUN npm install
+
+# COPY . .
+FROM morrisunix/plc-frontend:latest as build
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
-
-COPY . .
 
 # Set the environment variable for the build stage
 ARG REACT_APP_BACKEND_IP
