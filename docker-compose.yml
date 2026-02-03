@@ -10,8 +10,8 @@ services:
       retries: 5
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: yourpassword
-      POSTGRES_DB: testdb
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-yourpassword}
+      POSTGRES_DB: ${POSTGRES_DB:-users_db}
     ports:
       - "5432:5432"
     volumes:
@@ -43,8 +43,8 @@ services:
       start_period: 30s  # Initial period to wait for the service to start before health checks count
     environment:
       INFLUXDB_HTTP_AUTH_ENABLED: true
-      INFLUXDB_ADMIN_USER: admin
-      INFLUXDB_ADMIN_PASSWORD: supersecretpassword
+      INFLUXDB_ADMIN_USER: ${INFLUXDB_ADMIN_USER:-admin}
+      INFLUXDB_ADMIN_PASSWORD: ${INFLUXDB_ADMIN_PASSWORD:-supersecretpassword}
     volumes:
       - influxdb_data:/var/lib/influxdb
     networks:
@@ -66,7 +66,7 @@ services:
       - plc_layout
     container_name: plc_backend
     ports:
-      - "8000:8000"
+      - "${REACT_APP_BACKEND_PORT:-8000}:8000"
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "curl -s http://localhost:8000 | grep -Fq '{\"message\":\"PLC Backend is running\"}' || exit 1"]
@@ -76,8 +76,12 @@ services:
       start_period: 60s
     environment:
       DEBUG: "0"
-      DATABASE_URL: postgresql://postgres:yourpassword@plc_db/testdb
-      ALLOWED_ORIGINS: "http://plc.tecotrack.com:3000,http://plc.morrisunix.info:3000,http://plc:3000"
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-yourpassword}@plc_db/${POSTGRES_DB:-users_db}
+      # When try to use a different port for the frontend, uncomment out the following line and comment out the next line
+      # ALLOWED_ORIGINS: "http://${REACT_APP_BACKEND_IP:-plc.tecotrack.com}:${REACT_APP_FRONTEND_PORT:-80},http://plc:${REACT_APP_FRONTEND_PORT:-80}"
+      ALLOWED_ORIGINS: "http://${REACT_APP_BACKEND_IP:-plc.tecotrack.com},http://plc"
+      INFLUXDB_ADMIN_USER: ${INFLUXDB_ADMIN_USER:-admin}
+      INFLUXDB_ADMIN_PASSWORD: ${INFLUXDB_ADMIN_PASSWORD:-supersecretpassword}
     depends_on:
       influxdb:
         condition: service_healthy # This makes Grafana wait until InfluxDB is 'healthy'
@@ -97,12 +101,12 @@ services:
   frontend:
     build:
       context: ./frontend
-      args:
-        - REACT_APP_BACKEND_IP=plc.tecotrack.com
-        - REACT_APP_BACKEND_PORT=8000
+    environment:
+      - REACT_APP_BACKEND_IP=${REACT_APP_BACKEND_IP:-plc.tecotrack.com}
+      - REACT_APP_BACKEND_PORT=${REACT_APP_BACKEND_PORT:-8000}
     container_name: plc_frontend
     ports:
-      - "3000:80"
+      - "${REACT_APP_FRONTEND_PORT:-80}:80"
     stdin_open: true # Required for React development mode
     restart: unless-stopped
     depends_on:
@@ -124,7 +128,7 @@ services:
       dockerfile: ./grafana/Dockerfile
     container_name: plc_grafana
     ports:
-      - "3001:3000"
+      - "3000:3000"
     restart: unless-stopped
     depends_on:
       - influxdb
@@ -132,15 +136,15 @@ services:
       - grafana_data:/var/lib/grafana
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-      - GF_SECURITY_ADMIN_PASSWORD=Falcon32
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD:-Falcon32}
       - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_SERVER_ROOT_URL=http://plc.tecotrack.com:3001
+      - GF_SERVER_ROOT_URL=http://${REACT_APP_BACKEND_IP:-plc.tecotrack.com}:3000
       - GF_DEFAULT_INSTANCE_NAME=PLC
       - GF_USERS_DEFAULT_THEME=dark
       - INFLUXDB_HOST=plc_influxdb
       - INFLUXDB_PORT=8086
-      - INFLUXDB_USER=admin
-      - INFLUXDB_PASSWORD=supersecretpassword
+      - INFLUXDB_ADMIN_USER=${INFLUXDB_ADMIN_USER:-admin}
+      - INFLUXDB_ADMIN_PASSWORD=${INFLUXDB_ADMIN_PASSWORD:-supersecretpassword}
     networks:
       - plc-net
     deploy:
