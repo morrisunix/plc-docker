@@ -16,8 +16,8 @@ def generate_grafana_provisioning():
     
     # Static credentials and settings
     influx_url = f"http://{os.getenv('INFLUXDB_HOST', 'plc_influxdb')}:8086"
-    username = os.getenv('INFLUXDB_USER', 'admin')
-    password = os.getenv('INFLUXDB_PASSWORD', 'supersecretpassword')
+    username = os.getenv('INFLUXDB_ADMIN_USER', 'admin')
+    password = os.getenv('INFLUXDB_ADMIN_PASSWORD', 'supersecretpassword')
 
     for plc in layout.get('plc_info', []):
         plc_name = plc.get('plc_name')
