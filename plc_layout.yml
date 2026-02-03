@@ -10,7 +10,7 @@ plc_info:
     plc_rack: 0
     plc_slot: 1
     plc_location: "plant 1"
-    plc_display: true
+    plc_display: false
     plc_collection: true
     plc_labels:
       - label: "Temperature"
@@ -20,6 +20,8 @@ plc_info:
         front_end: "temperature"
         display: true
         collection: true
+        minimum: 0
+        maximum: null
       - label: "Volume"
         operation: "/10"
         revert_operation: "*10"
@@ -27,6 +29,8 @@ plc_info:
         front_end: "volume"
         display: true
         collection: true
+        minimum: 0
+        maximum: null
       - label: "High Temperature"
         operation: "/10"
         revert_operation: "*10"
@@ -34,6 +38,8 @@ plc_info:
         front_end: "text_box"
         display: true
         collection: true
+        minimum: 0
+        maximum: null
       - label: "Low Temperature"
         operation: "/10"
         revert_operation: "*10"
@@ -41,6 +47,8 @@ plc_info:
         front_end: "text_box"
         display: true
         collection: true
+        minimum: 0
+        maximum: null
       - label: "Timer 1"
         operation: "*10"
         revert_operation: "/10"
@@ -48,6 +56,8 @@ plc_info:
         front_end: "text_box"
         display: true
         collection: true
+        minimum: 0
+        maximum: null
       - label: "Timer 2"
         operation: "*10"
         revert_operation: "/10"
@@ -55,50 +65,52 @@ plc_info:
         front_end: "text_box"
         display: true
         collection: true
+        minimum: 0
+        maximum: null
     plc_inputs:
-      - label: "Button 1"
+      - label: "button_1"
         address: "I0.0"
         display: true
-      - label: "Button 2"
+      - label: "button_2"
         address: "I0.1"
         display: true
-      - label: "Button 3"
+      - label: "button_3"
         address: "I0.2"
         display: true
-      - label: "Button 4"
+      - label: "button_4"
         address: "I0.3"
         display: true
     plc_outputs:
-      - label: "Motor 1"
+      - label: "motor_1"
         address: "Q0.0"
         display: true
-      - label: "Motor 2"
+      - label: "motor_2"
         address: "Q0.1"
         display: true
-      - label: "Motor 3"
+      - label: "motor_3"
         address: "Q0.2"
         display: true
-      - label: "Motor 4"
+      - label: "motor_4"
         address: "Q0.3"
         display: true
     plc_markers:
-      - label: "Program_1"
+      - label: "program_1"
         address: 1
         display: true
-      - label: "Program_2"
+      - label: "program_2"
         address: 2
         display: true
-      - label: "Program_3"
+      - label: "program_3"
         address: 3
         display: true
-      - label: "Program_4"
+      - label: "program_4"
         address: 4
         display: true
   - plc_name: PLC2
     plc_ip: "192.168.50.69"
     plc_rack: 0
     plc_slot: 1
-    plc_location: "plant 2"
+    plc_location: "plant_2"
     plc_display: true
     plc_collection: true
     plc_labels:
@@ -109,6 +121,9 @@ plc_info:
         front_end: "flow_rate"
         display: true
         collection: true
+        minimum: 0
+        maximum: null
+        display_filter: false
       - label: "Temperature"
         operation: "/10"
         revert_operation: "*10"
@@ -116,6 +131,8 @@ plc_info:
         front_end: "temperature"
         display: false 
         collection: true
+        minimum: -100
+        maximum: 100
       - label: "Volume"
         operation: "/10"
         revert_operation: "*10"
@@ -123,20 +140,50 @@ plc_info:
         front_end: "volume"
         display: false 
         collection: true
+        minimum: 0
+        maximum: null
       - label: "Volume 2"
         operation: "/10"
         revert_operation: "*10"
         unit: "Lts"
         front_end: "volume"
-        display: true
+        display: false
         collection: true
+        minimum: 0
+        maximum: null
+    plc_inputs:
+      - label: "button_1"
+        address: "I0.0"
+        display: false
+      - label: "button_2"
+        address: "I0.1"
+        display: false
+      - label: "Product"
+        address: "I0.2"
+        display: false
+      - label: "Water"
+        address: "I0.3"
+        display: false
+    plc_outputs:
+      - label: "motor_1"
+        address: "Q0.0"
+        display: false
+      - label: "motor_2"
+        address: "Q0.1"
+        display: false
+      - label: "motor_3"
+        address: "Q0.2"
+        display: false
+      - label: "motor4"
+        address: "Q0.3"
+        display: false
     plc_markers:
-      - label: "Program_1"
+      - label: "program_1"
         address: 1
-        display: true
-      - label: "Program_2"
+        display: false
+      - label: "program_2"
         address: 2
-        display: true
-      - label: "Program_9"
+        display: false
+      - label: "program_9"
         address: 9
         display: true
