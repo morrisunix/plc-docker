@@ -3,166 +3,62 @@ general_settings:
   plc_customer: "Embotelladora"
   plc_collection: true
   plc_display: true
-  plc_refresh_rate: 0.01
+  plc_refresh_rate: 1.0
 plc_info:
   - plc_name: PLC1
-    plc_ip: "192.168.50.69"
+    plc_ip: "192.168.50.70"
     plc_rack: 0
     plc_slot: 1
     plc_location: "plant 1"
-    plc_display: false
-    plc_collection: true
-    plc_labels:
-      - label: "Temperature"
-        operation: "/10"
-        revert_operation: "*10"
-        unit: "°C"
-        front_end: "temperature"
-        display: true
-        collection: true
-        minimum: 0
-        maximum: null
-      - label: "Volume"
-        operation: "/10"
-        revert_operation: "*10"
-        unit: "Lts"
-        front_end: "volume"
-        display: true
-        collection: true
-        minimum: 0
-        maximum: null
-      - label: "High Temperature"
-        operation: "/10"
-        revert_operation: "*10"
-        unit: "°C"
-        front_end: "text_box"
-        display: true
-        collection: true
-        minimum: 0
-        maximum: null
-      - label: "Low Temperature"
-        operation: "/10"
-        revert_operation: "*10"
-        unit: "°C"
-        front_end: "text_box"
-        display: true
-        collection: true
-        minimum: 0
-        maximum: null
-      - label: "Timer 1"
-        operation: "*10"
-        revert_operation: "/10"
-        unit: "ms"
-        front_end: "text_box"
-        display: true
-        collection: true
-        minimum: 0
-        maximum: null
-      - label: "Timer 2"
-        operation: "*10"
-        revert_operation: "/10"
-        unit: "ms"
-        front_end: "text_box"
-        display: true
-        collection: true
-        minimum: 0
-        maximum: null
-    plc_inputs:
-      - label: "button_1"
-        address: "I0.0"
-        display: true
-      - label: "button_2"
-        address: "I0.1"
-        display: true
-      - label: "button_3"
-        address: "I0.2"
-        display: true
-      - label: "button_4"
-        address: "I0.3"
-        display: true
-    plc_outputs:
-      - label: "motor_1"
-        address: "Q0.0"
-        display: true
-      - label: "motor_2"
-        address: "Q0.1"
-        display: true
-      - label: "motor_3"
-        address: "Q0.2"
-        display: true
-      - label: "motor_4"
-        address: "Q0.3"
-        display: true
-    plc_markers:
-      - label: "program_1"
-        address: 1
-        display: true
-      - label: "program_2"
-        address: 2
-        display: true
-      - label: "program_3"
-        address: 3
-        display: true
-      - label: "program_4"
-        address: 4
-        display: true
-  - plc_name: PLC2
-    plc_ip: "192.168.50.69"
-    plc_rack: 0
-    plc_slot: 1
-    plc_location: "plant_2"
     plc_display: true
     plc_collection: true
     plc_labels:
-      - label: "Flow_Rate"
-        operation: "/1"
-        revert_operation: "*1"
-        unit: "Lts/min"
-        front_end: "flow_rate"
+      - label: "Flow_Rate_1"
+        operation: "*40"
+        revert_operation: "/40"
+        unit: "Lts/hr"
+        front_end: "flow_rate_1"
         display: true
         collection: true
         minimum: 0
         maximum: null
         display_filter: false
-      - label: "Temperature"
-        operation: "/10"
-        revert_operation: "*10"
-        unit: "°C"
-        front_end: "temperature"
-        display: false 
-        collection: true
-        minimum: -100
-        maximum: 100
-      - label: "Volume"
-        operation: "/10"
-        revert_operation: "*10"
-        unit: "Lts"
-        front_end: "volume"
-        display: false 
+      - label: "Flow_Rate_2"
+        operation: "*40"
+        revert_operation: "/40"
+        unit: "Lts/hr"
+        front_end: "flow_rate_2"
+        display: true
         collection: true
         minimum: 0
         maximum: null
-      - label: "Volume 2"
-        operation: "/10"
-        revert_operation: "*10"
-        unit: "Lts"
-        front_end: "volume"
-        display: false
+        display_filter: false
+      - label: "Flow_Rate_3"
+        operation: "*40"
+        revert_operation: "/40"
+        unit: "Lts/hr"
+        front_end: "flow_rate_3"
+        display: true
         collection: true
         minimum: 0
         maximum: null
+        display_filter: false
+      - label: "Flow_Rate_4"
+        operation: "*40"
+        revert_operation: "/40"
+        unit: "Lts/hr"
+        front_end: "flow_rate_4"
+        display: true
+        collection: true
+        minimum: 0
+        maximum: null
+        display_filter: false
     plc_inputs:
-      - label: "button_1"
+      - label: "Product"
         address: "I0.0"
         display: false
-      - label: "button_2"
-        address: "I0.1"
-        display: false
-      - label: "Product"
-        address: "I0.2"
-        display: false
       - label: "Water"
-        address: "I0.3"
+        address: "I0.1"
         display: false
     plc_outputs:
       - label: "motor_1"
@@ -186,4 +82,4 @@ plc_info:
         display: false
       - label: "program_9"
         address: 9
-        display: true
+        display: false
