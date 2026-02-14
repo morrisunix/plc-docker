@@ -180,6 +180,33 @@ services:
           cpus: '0.25'
           memory: 128M
 
+  backup:
+    build:
+      context: ./backup
+    container_name: plc_backup
+    restart: unless-stopped
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      - AWS_S3_PATH=${AWS_S3_PATH:-plc-backups}
+      - BACKUP_CRON=${BACKUP_CRON:-0 2 * * *}
+    volumes:
+      - influxdb_data:/backup/influxdb:ro
+    secrets:
+      - source: plc_layout
+        target: /backup/plc_layout.yml
+    networks:
+      - plc-net
+    depends_on:
+      - influxdb
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 256M
+
 volumes:
   postgres_data:
     driver: local

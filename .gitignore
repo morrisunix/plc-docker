@@ -1,0 +1,23 @@
+# Dependencies
+frontend/node_modules/
+backend/__pycache__/
+*.py[cod]
+*$py.class
+
+# Build outputs
+frontend/build/
+dist/
+build/
+
+# Environment variables
+*.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project specific
+backup/README.md
+!backup/backup.sh
+!backup/Dockerfile
