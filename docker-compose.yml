@@ -192,11 +192,11 @@ services:
       - AWS_S3_BUCKET=${AWS_S3_BUCKET}
       - AWS_S3_PATH=${AWS_S3_PATH:-plc-backups}
       - BACKUP_CRON=${BACKUP_CRON:-0 2 * * *}
+      - BACKUP_DIRS=${BACKUP_DIRS:-influxdb postgres plc_layout.yml}
     volumes:
       - influxdb_data:/backup/influxdb:ro
-    secrets:
-      - source: plc_layout
-        target: /backup/plc_layout.yml
+      - postgres_data:/backup/postgres:ro
+      - ./plc_layout.yml:/backup/plc_layout.yml:ro
     networks:
       - plc-net
     depends_on:
